@@ -183,13 +183,13 @@ describe('Monitor', function () {
                     server.emit('internalError', request, new Error('mock error'));
                     reply('done');
                 }
-            })
+            });
 
             var plugin = {
                 register: require('../lib/index').register,
                 options: options
-            }
-debugger;
+            };
+
 //             var r = internals.makeBroadcaster(null, function (callback) {
 // debugger
 //                 expect(this._eventQueue.length).to.equal(hitCount + 1);
@@ -206,14 +206,14 @@ debugger;
                 }
             });
             broadcaster.report = function (callback) {
-debugger;
+
                 expect(this._eventQueue.length).to.equal(hitCount + 1);
                 hitCount++;
                 return callback(null);
             };
 
             options.subscribers.push(broadcaster);
-debugger;
+
             server.pack.register(plugin, function () {
 
                 server.start(function () {
@@ -223,8 +223,7 @@ debugger;
                         var events = broadcaster._eventQueue;
                         expect(res.statusCode).to.equal(200);
                         expect(hitCount).to.equal(3);
-                        debugger;
-                        //expect(events[0])
+                        expect(events.length).to.equal(3);
 
 
 
