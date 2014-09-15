@@ -25,11 +25,7 @@ describe('Plugin', function () {
 
         var server = new Hapi.Server();
 
-        var options = {
-            subscribers: {},
-            opsInterval: 100,
-            alwaysMeasureOps: true
-        };
+        var options = {};
 
         var plugin = {
            plugin: require('..'),
@@ -48,5 +44,3 @@ describe('Plugin', function () {
         });
     });
 });
-
-
