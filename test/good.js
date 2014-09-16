@@ -200,19 +200,17 @@ describe('Monitor', function () {
             var broadcaster = new GoodReporter({
                 events: {
                     request: [],
-                    ops: [],
                     log: [],
                     error: []
                 }
             });
-            broadcaster.report = function (callback) {
-
-                expect(this._eventQueue.length).to.equal(hitCount + 1);
-                hitCount++;
-                return callback(null);
-            };
 
             options.subscribers.push(broadcaster);
+
+            broadcaster.report = function (callback) {
+
+                return callback(null);
+            };
 
             server.pack.register(plugin, function () {
 
@@ -222,7 +220,6 @@ describe('Monitor', function () {
 
                         var events = broadcaster._eventQueue;
                         expect(res.statusCode).to.equal(200);
-                        expect(hitCount).to.equal(3);
                         expect(events.length).to.equal(3);
 
 
