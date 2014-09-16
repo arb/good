@@ -167,10 +167,6 @@ describe('Monitor', function () {
 
         it('sends events to the immediate list when they occur', function (done) {
 
-            var options = {
-                subscribers: []
-            };
-
             var hitCount = 0;
 
             var server = new Hapi.Server('127.0.0.1', 0);
@@ -185,34 +181,38 @@ describe('Monitor', function () {
                 }
             });
 
-            var plugin = {
-                register: require('../lib/index').register,
-                options: options
+            var Reporter = function () {
+
+                var settings = {
+                    events: {
+                        request: [],
+                        ops: [],
+                        log: [],
+                        error: []
+                    }
+                };
+
+                GoodReporter.call(this, settings);
+                return this;
             };
 
-//             var r = internals.makeBroadcaster(null, function (callback) {
-// debugger
-//                 expect(this._eventQueue.length).to.equal(hitCount + 1);
-//                 hitCount++;
-//                 return callback(null);
-//             });
+            Hoek.inherits(Reporter, GoodReporter);
 
-            var broadcaster = new GoodReporter({
-                events: {
-                    request: [],
-                    ops: [],
-                    log: [],
-                    error: []
-                }
-            });
-            broadcaster.report = function (callback) {
+            Reporter.prototype.report = function (callback) {
 
-                expect(this._eventQueue.length).to.equal(hitCount + 1);
-                hitCount++;
+                expect(this._eventQueue.length).to.equal(++hitCount);
                 return callback(null);
             };
 
-            options.subscribers.push(broadcaster);
+
+            var broadcaster = new Reporter();
+
+            var plugin = {
+                register: require('../lib/index').register,
+                options: {
+                    subscribers: [broadcaster]
+                }
+            };
 
             server.pack.register(plugin, function () {
 
@@ -220,12 +220,9 @@ describe('Monitor', function () {
 
                     Http.get('http://127.0.0.1:' + server.info.port + '/?q=test', function (res) {
 
-                        var events = broadcaster._eventQueue;
                         expect(res.statusCode).to.equal(200);
                         expect(hitCount).to.equal(3);
-                        expect(events.length).to.equal(3);
-
-
+                        expect(broadcaster._eventQueue.length).to.equal(hitCount);
 
                         done();
                     });
