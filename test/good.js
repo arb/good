@@ -204,7 +204,6 @@ describe('Monitor', function () {
                 return callback(null);
             };
 
-
             var broadcaster = new Reporter();
 
             var plugin = {
@@ -222,7 +221,10 @@ describe('Monitor', function () {
 
                         expect(res.statusCode).to.equal(200);
                         expect(hitCount).to.equal(3);
-                        expect(broadcaster._eventQueue.length).to.equal(hitCount);
+                        setTimeout(function () {
+
+                            expect(broadcaster._eventQueue.length).to.equal(hitCount);
+                        }, 200);
 
                         done();
                     });
